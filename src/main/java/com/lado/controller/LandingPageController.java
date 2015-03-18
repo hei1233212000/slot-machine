@@ -47,6 +47,7 @@ public class LandingPageController {
 	private Button rolling;
 
 	@FXML
+	@ActionTrigger(ACTION_ADD_CHOICE)
 	private TextField newChoiceNameField;
 
 	@FXML
