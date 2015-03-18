@@ -27,13 +27,31 @@ import java.util.stream.Stream;
 public class LandingPageController {
 	private static final Logger LOG = LoggerFactory.getLogger(LandingPageController.class);
 
+	private static final String ACTION_ADD_CHOICE = "addChoice";
+	private static final String ACTION_DELETE_CHOICE = "deleteChoice";
 	private static final String ACTION_IMPORT_CHOICES = "importChoices";
 	private static final String ACTION_EXPORT_CHOICES = "exportChoices";
 	private static final String ACTION_ABOUT = "about";
 	private static final String ACTION_ROLLING = "rolling";
 
 	@FXML
-	private ListView<String> choiceListView;
+	private ListView<String> choices;
+
+	@FXML
+	@ActionTrigger(ACTION_ABOUT)
+	private MenuItem about;
+
+	@FXML
+	@ActionTrigger(ACTION_ROLLING)
+	private Button rolling;
+
+	@FXML
+	@ActionTrigger(ACTION_ADD_CHOICE)
+	private Button addChoice;
+
+	@FXML
+	@ActionTrigger(ACTION_DELETE_CHOICE)
+	private Button deleteChoice;
 
 	@FXML
 	@ActionTrigger(ACTION_IMPORT_CHOICES)
@@ -42,14 +60,6 @@ public class LandingPageController {
 	@FXML
 	@ActionTrigger(ACTION_EXPORT_CHOICES)
 	private MenuItem exportChoices;
-
-	@FXML
-	@ActionTrigger(ACTION_ABOUT)
-	private MenuItem about;
-
-	@FXML
-	@ActionTrigger(ACTION_ROLLING)
-	private Button rollingButton;
 
 	@FXML
 	private Label result;
@@ -63,22 +73,24 @@ public class LandingPageController {
 	public void init() throws IOException, URISyntaxException {
 		// TODO: should use IoC framework
 		choiceService = new ChoiceService();
-		List<String> choiceNames = choiceService.findAll()
-										.stream()
-										.flatMap(c -> Stream.of(c.getName()))
-										.collect(Collectors.toList());
-		choiceListView.setItems(FXCollections.observableArrayList(choiceNames));
+		refreshChoices();
 	}
 
-	@ActionMethod(ACTION_ROLLING)
-	public void rolling() {
-		Choice choice = choiceService.randomPick();
-		result.setText(choice.getName());
-		rollCount.setText(Integer.toString(choiceService.getRollCount()));
+	@ActionMethod(ACTION_ADD_CHOICE)
+	public void addChoice() {
+		// TODO: implement this
+		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "Add choice", null, "Coming soon...");
+	}
+
+	@ActionMethod(ACTION_DELETE_CHOICE)
+	public void deleteChoice() {
+		// TODO: implement this
+		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "Delete choice", null, "Coming soon...");
 	}
 
 	@ActionMethod(ACTION_IMPORT_CHOICES)
 	public void importChoices() {
+		// TODO: implement this
 		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "Import", null, "Coming soon...");
 		if (1 == 1) return;
 		try {
@@ -100,11 +112,28 @@ public class LandingPageController {
 		// get the current list of pojo
 		// convert the list into file
 		// export it
+		// TODO: implement this
 		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "Export", null, "Coming soon...");
+	}
+
+	@ActionMethod(ACTION_ROLLING)
+	public void rolling() {
+		Choice choice = choiceService.randomPick();
+		result.setText(choice.getName());
+		rollCount.setText(Integer.toString(choiceService.getRollCount()));
 	}
 
 	@ActionMethod(ACTION_ABOUT)
 	public void about() {
+		// TODO: implement this
 		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "About", null, "Coming soon...");
+	}
+
+	private void refreshChoices() {
+		List<String> choiceNames = choiceService.findAll()
+				.stream()
+				.flatMap(c -> Stream.of(c.getName()))
+				.collect(Collectors.toList());
+		choices.setItems(FXCollections.observableArrayList(choiceNames));
 	}
 }

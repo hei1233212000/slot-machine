@@ -24,6 +24,7 @@ public class ChoiceService {
 	public static final List<String> DEFAULT_CHOICE_NAMES = Arrays
 			.asList("Student Can", "Fortune Metropolis", "Tam's Yunnan Noodle", "Ar Duck", "Staff Can");
 
+	private static long choiceId = 1;
 	private static ConcurrentMap<Long, Choice> db = Maps.newConcurrentMap();
 	private static int rollCount = 0;
 
@@ -55,6 +56,11 @@ public class ChoiceService {
 		return rollCount;
 	}
 
+	public Choice delete(long id) {
+		LOG.info("removed choice with id: {}", id);
+		return db.remove(id);
+	}
+
 	private List<Choice> convert(File file) throws IOException {
 		if (file == null || !file.exists() || !file.isFile())
 			throw new IllegalArgumentException("invalid file input is detected: " + file);
@@ -72,10 +78,13 @@ public class ChoiceService {
 
 	private List<Choice> defaultChoices() {
 		List<Choice> defaultChoices = Lists.newArrayList();
-		for (int index = 0; index < DEFAULT_CHOICE_NAMES.size(); index++) {
-			defaultChoices
-					.add(new Choice.Builder().id((long) (index + 1)).name(DEFAULT_CHOICE_NAMES.get(index)).build());
+		for (String choiceName : DEFAULT_CHOICE_NAMES) {
+			defaultChoices.add(new Choice.Builder().id(findNextChoiceId()).name(choiceName).build());
 		}
 		return defaultChoices;
+	}
+
+	private long findNextChoiceId() {
+		return choiceId++;
 	}
 }
