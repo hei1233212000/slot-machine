@@ -49,8 +49,14 @@ public class ChoiceService {
 		return choice;
 	}
 
+	/**
+	 * The result would be ordered by name
+	 */
 	public List<Choice> findAll() {
-		return Lists.newArrayList(db.values());
+		return Lists.newArrayList(db.values())
+				.stream()
+				.sorted((a, b) -> a.getName().compareToIgnoreCase(b.getName()))
+				.collect(Collectors.toList());
 	}
 
 	public int getRollCount() {

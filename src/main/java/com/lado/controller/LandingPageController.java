@@ -36,7 +36,7 @@ public class LandingPageController {
 	private static final String ACTION_ROLLING = "rolling";
 
 	@FXML
-	private ListView<String> choices;
+	private ListView<Choice> choices;
 
 	@FXML
 	@ActionTrigger(ACTION_ABOUT)
@@ -73,6 +73,18 @@ public class LandingPageController {
 	public void init() throws IOException, URISyntaxException {
 		// TODO: should use IoC framework
 		choiceService = new ChoiceService();
+		choices.setCellFactory(v -> new ListCell<Choice>() {
+			@Override
+			protected void updateItem(Choice choice, boolean empty) {
+				super.updateItem(choice, empty);
+				if (empty || choice == null) {
+					setText(null);
+					setGraphic(null);
+				} else {
+					setText(choice.getName());
+				}
+			}
+		});
 		refreshChoices();
 	}
 
@@ -130,10 +142,6 @@ public class LandingPageController {
 	}
 
 	private void refreshChoices() {
-		List<String> choiceNames = choiceService.findAll()
-				.stream()
-				.flatMap(c -> Stream.of(c.getName()))
-				.collect(Collectors.toList());
-		choices.setItems(FXCollections.observableArrayList(choiceNames));
+		choices.setItems(FXCollections.observableArrayList(choiceService.findAll()));
 	}
 }
