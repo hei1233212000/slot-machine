@@ -67,12 +67,15 @@ public class ChoiceService {
 		if (Strings.isNullOrEmpty(choiceName)) throw new IllegalArgumentException("choiceName cannot be null or empty");
 		Choice newChoice = new Choice.Builder().id(findNextChoiceId()).name(choiceName).build();
 		db.put(newChoice.getId(), newChoice);
+		LOG.info("new Choice is added: {}", newChoice);
 		return newChoice;
 	}
 
 	public Choice delete(long id) {
-		LOG.info("removed choice with id: {}", id);
-		return db.remove(id);
+		LOG.info("Choice with id[{}] is going to be deleted", id);
+		Choice removedChoice = db.remove(id);
+		LOG.info("{} is removed", removedChoice);
+		return removedChoice;
 	}
 
 	private List<Choice> convert(File file) throws IOException {

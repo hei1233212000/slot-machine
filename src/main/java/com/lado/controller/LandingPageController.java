@@ -55,6 +55,10 @@ public class LandingPageController {
 	private Button addChoice;
 
 	@FXML
+	@ActionTrigger(ACTION_DELETE_CHOICE)
+	private Button deleteChoice;
+
+	@FXML
 	@ActionTrigger(ACTION_IMPORT_CHOICES)
 	private MenuItem importChoices;
 
@@ -99,6 +103,17 @@ public class LandingPageController {
 		choiceService.add(newChoiceName);
 		refreshChoices();
 		newChoiceNameField.setText("");
+	}
+
+	@ActionMethod(ACTION_DELETE_CHOICE)
+	public void deleteChoice() {
+		Choice selectedChoice = choices.getSelectionModel().getSelectedItem();
+		if (selectedChoice == null) {
+			Fxmls.createStandardAlertAndShow(Alert.AlertType.WARNING, "Delete choice", null, "Please select a choice");
+			return;
+		}
+		choiceService.delete(selectedChoice.getId());
+		refreshChoices();
 	}
 
 	@ActionMethod(ACTION_IMPORT_CHOICES)

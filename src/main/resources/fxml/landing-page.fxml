@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import java.net.URL?>
-<BorderPane prefHeight="300.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml">
+<BorderPane prefHeight="400.0" prefWidth="800.0" xmlns:fx="http://javafx.com/fxml">
     <top>
         <MenuBar>
             <menus>
@@ -39,6 +39,13 @@
                         </padding>
                         <TextField fx:id="newChoiceNameField" promptText="Choice Name"/>
                         <Button fx:id="addChoice" text="Add"/>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT" spacing="10">
+                        <padding>
+                            <Insets top="5" right="5" bottom="5" left="5"/>
+                        </padding>
+                        <Label text="Select a Choice to delete"/>
+                        <Button fx:id="deleteChoice" text="Delete"/>
                     </HBox>
                 </VBox>
                 <Label fx:id="result" text="Please press the Rolling button..." styleClass="result"/>
