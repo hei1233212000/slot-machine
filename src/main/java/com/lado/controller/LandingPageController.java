@@ -125,8 +125,8 @@ public class LandingPageController {
 
 	@ActionMethod(ACTION_ABOUT)
 	public void about() {
-		// TODO: implement this
-		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "About", null, "Coming soon...");
+		String about = "If you have any enquiry, advice, bug report, etc, please report it to https://github.com/hei1233212000/slot-machine\nHave a nice day :)";
+		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "About", null, about);
 	}
 
 	private void refreshChoices() {
