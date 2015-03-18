@@ -1,5 +1,6 @@
 package com.lado.service;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.lado.model.Choice;
@@ -54,6 +55,13 @@ public class ChoiceService {
 
 	public int getRollCount() {
 		return rollCount;
+	}
+
+	public Choice add(String choiceName) {
+		if (Strings.isNullOrEmpty(choiceName)) throw new IllegalArgumentException("choiceName cannot be null or empty");
+		Choice newChoice = new Choice.Builder().id(findNextChoiceId()).name(choiceName).build();
+		db.put(newChoice.getId(), newChoice);
+		return newChoice;
 	}
 
 	public Choice delete(long id) {

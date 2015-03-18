@@ -1,5 +1,6 @@
 package com.lado.controller;
 
+import com.google.common.base.Strings;
 import com.lado.model.Choice;
 import com.lado.service.ChoiceService;
 import com.lado.util.Fxmls;
@@ -46,12 +47,11 @@ public class LandingPageController {
 	private Button rolling;
 
 	@FXML
-	@ActionTrigger(ACTION_ADD_CHOICE)
-	private Button addChoice;
+	private TextField newChoiceNameField;
 
 	@FXML
-	@ActionTrigger(ACTION_DELETE_CHOICE)
-	private Button deleteChoice;
+	@ActionTrigger(ACTION_ADD_CHOICE)
+	private Button addChoice;
 
 	@FXML
 	@ActionTrigger(ACTION_IMPORT_CHOICES)
@@ -78,14 +78,14 @@ public class LandingPageController {
 
 	@ActionMethod(ACTION_ADD_CHOICE)
 	public void addChoice() {
-		// TODO: implement this
-		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "Add choice", null, "Coming soon...");
-	}
-
-	@ActionMethod(ACTION_DELETE_CHOICE)
-	public void deleteChoice() {
-		// TODO: implement this
-		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "Delete choice", null, "Coming soon...");
+		String newChoiceName = newChoiceNameField.getText();
+		if (Strings.isNullOrEmpty(newChoiceName) || newChoiceName.trim().isEmpty()) {
+			Fxmls.createStandardAlertAndShow(Alert.AlertType.WARNING, "Add choice", null, "Please enter Choice Name");
+			return;
+		}
+		choiceService.add(newChoiceName);
+		refreshChoices();
+		newChoiceNameField.setText("");
 	}
 
 	@ActionMethod(ACTION_IMPORT_CHOICES)

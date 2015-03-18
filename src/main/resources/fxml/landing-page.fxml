@@ -37,8 +37,8 @@
                         <padding>
                             <Insets top="5" right="5" bottom="5" left="5"/>
                         </padding>
+                        <TextField fx:id="newChoiceNameField" promptText="Choice Name"/>
                         <Button fx:id="addChoice" text="Add"/>
-                        <Button fx:id="deleteChoice" text="Delete"/>
                     </HBox>
                 </VBox>
                 <Label fx:id="result" text="Please press the Rolling button..." styleClass="result"/>
