@@ -1,0 +1,12 @@
+.settings/
+logs/
+target/
+.classpath
+.project
+bin/
+.idea/
+*.iml
+*.eml
+build/
+.gradle
+gfembed*

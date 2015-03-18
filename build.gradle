@@ -1,0 +1,37 @@
+apply from: 'http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin'
+
+sourceCompatibility = 1.8
+version = '1.0'
+
+repositories {
+	mavenLocal()
+    mavenCentral()
+}
+
+ext {
+    datafxVersion = '8.0b9'
+    guavaVersion = '18.0';
+    logbackVersion = '1.1.2'
+    slf4jVersion = '1.7.7'
+    junitVersion = '4.11'
+}
+
+dependencies {
+    compile "io.datafx:flow:$datafxVersion"
+    compile "com.google.guava:guava:$guavaVersion"
+    compile "ch.qos.logback:logback-classic:$logbackVersion"
+    compile "org.slf4j:jcl-over-slf4j:$slf4jVersion"
+    compile "org.slf4j:log4j-over-slf4j:$slf4jVersion"
+    compile "org.slf4j:jul-to-slf4j:$slf4jVersion"
+
+    testCompile "junit:junit:$junitVersion"
+}
+
+javafx {
+    // Application name and ID presented by target OS
+    appID 'SlotMachine'
+    appName 'Slot Machine'
+
+    // Main class of application
+    mainClass 'com.lado.Main'
+}
