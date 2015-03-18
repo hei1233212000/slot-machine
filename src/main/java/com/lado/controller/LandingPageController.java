@@ -27,24 +27,24 @@ import java.util.stream.Stream;
 public class LandingPageController {
 	private static final Logger LOG = LoggerFactory.getLogger(LandingPageController.class);
 
-	private static final String ACTION_IMPORT_FILE = "importFile";
-	private static final String ACTION_EXPORT_FILE = "exportFile";
-	private static final String ACTION_AOUT = "about";
+	private static final String ACTION_IMPORT_CHOICES = "importChoices";
+	private static final String ACTION_EXPORT_CHOICES = "exportChoices";
+	private static final String ACTION_ABOUT = "about";
 	private static final String ACTION_ROLLING = "rolling";
 
 	@FXML
 	private ListView<String> choiceListView;
 
 	@FXML
-	@ActionTrigger(ACTION_IMPORT_FILE)
-	private MenuItem importFile;
+	@ActionTrigger(ACTION_IMPORT_CHOICES)
+	private MenuItem importChoices;
 
 	@FXML
-	@ActionTrigger(ACTION_EXPORT_FILE)
-	private MenuItem exportFile;
+	@ActionTrigger(ACTION_EXPORT_CHOICES)
+	private MenuItem exportChoices;
 
 	@FXML
-	@ActionTrigger(ACTION_AOUT)
+	@ActionTrigger(ACTION_ABOUT)
 	private MenuItem about;
 
 	@FXML
@@ -77,8 +77,8 @@ public class LandingPageController {
 		rollCount.setText(Integer.toString(choiceService.getRollCount()));
 	}
 
-	@ActionMethod(ACTION_IMPORT_FILE)
-	public void importFile() {
+	@ActionMethod(ACTION_IMPORT_CHOICES)
+	public void importChoices() {
 		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "Import", null, "Coming soon...");
 		if (1 == 1) return;
 		try {
@@ -95,15 +95,15 @@ public class LandingPageController {
 		}
 	}
 
-	@ActionMethod(ACTION_EXPORT_FILE)
-	public void exportFile() {
+	@ActionMethod(ACTION_EXPORT_CHOICES)
+	public void exportChoices() {
 		// get the current list of pojo
 		// convert the list into file
 		// export it
 		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "Export", null, "Coming soon...");
 	}
 
-	@ActionMethod(ACTION_AOUT)
+	@ActionMethod(ACTION_ABOUT)
 	public void about() {
 		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "About", null, "Coming soon...");
 	}

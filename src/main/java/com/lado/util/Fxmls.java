@@ -58,5 +58,4 @@ public final class Fxmls {
 		alert.setContentText(contentText);
 		return alert;
 	}
-
 }

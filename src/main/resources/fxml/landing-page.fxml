@@ -10,21 +10,21 @@
     <top>
         <MenuBar>
             <menus>
-                <Menu text="File">
+                <Menu text="_Choice" mnemonicParsing="true">
                     <items>
-                        <MenuItem fx:id="importFile" text="Import"/>
-                        <MenuItem fx:id="exportFile" text="Export"/>
+                        <MenuItem fx:id="importChoices" text="_Import" mnemonicParsing="true"/>
+                        <MenuItem fx:id="exportChoices" text="_Export" mnemonicParsing="true"/>
                     </items>
                 </Menu>
-                <Menu text="Help">
+                <Menu text="_Help" mnemonicParsing="true">
                     <items>
-                        <MenuItem fx:id="about" text="About"/>
+                        <MenuItem fx:id="about" text="_About" mnemonicParsing="true"/>
                     </items>
                 </Menu>
             </menus>
         </MenuBar>
     </top>
-    <left>
+    <left >
         <VBox>
             <Label text="Choices"/>
             <ListView fx:id="choiceListView" prefWidth="200"/>
