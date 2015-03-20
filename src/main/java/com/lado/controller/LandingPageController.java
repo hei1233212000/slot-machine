@@ -7,6 +7,8 @@ import com.lado.util.Fxmls;
 import io.datafx.controller.FXMLController;
 import io.datafx.controller.flow.action.ActionMethod;
 import io.datafx.controller.flow.action.ActionTrigger;
+import io.datafx.controller.flow.context.FXMLViewFlowContext;
+import io.datafx.controller.flow.context.ViewFlowContext;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -17,12 +19,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @FXMLController("/fxml/landing-page.fxml")
 public class LandingPageController {
@@ -34,6 +35,9 @@ public class LandingPageController {
 	private static final String ACTION_EXPORT_CHOICES = "exportChoices";
 	private static final String ACTION_ABOUT = "about";
 	private static final String ACTION_ROLLING = "rolling";
+
+    @FXMLViewFlowContext
+    private ViewFlowContext viewFlowContext;
 
 	@FXML
 	private ListView<Choice> choices;
@@ -137,11 +141,23 @@ public class LandingPageController {
 
 	@ActionMethod(ACTION_EXPORT_CHOICES)
 	public void exportChoices() {
-		// get the current list of pojo
-		// convert the list into file
-		// export it
-		// TODO: implement this
-		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "Export", null, "Coming soon...");
+        try {
+            FileChooser fileChooser = new FileChooser();
+            //Set extension filter
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt"));
+            File file = fileChooser.showSaveDialog(
+                    viewFlowContext.getCurrentViewContext().getRootNode().getScene().getWindow());
+            try (FileWriter fileWriter = new FileWriter(file)) {
+                for (String choice : choiceService.findAll().stream().map(Choice::getName)
+                        .collect(Collectors.toList())) {
+                    fileWriter.write(choice);
+                    fileWriter.write(System.lineSeparator());
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("e: " + e, e);
+            Fxmls.createStandardExceptionDialogAndShow("Export Choice Fail", null, "Fail to export choices", e);
+        }
 	}
 
 	@ActionMethod(ACTION_ROLLING)
