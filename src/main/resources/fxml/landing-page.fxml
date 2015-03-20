@@ -48,7 +48,9 @@
                         <Button fx:id="deleteChoice" text="Delete"/>
                     </HBox>
                 </VBox>
-                <Label fx:id="result" text="Please press the Rolling button..." styleClass="result"/>
+                <HBox alignment="CENTER">
+                    <Label fx:id="result" text="Please press the Rolling button..." styleClass="result"/>
+                </HBox>
             </items>
         </SplitPane>
     </center>
