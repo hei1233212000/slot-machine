@@ -3,6 +3,8 @@ package com.lado.service;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
+import com.lado.exception.InvalidChoiceException;
 import com.lado.model.Choice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,13 +13,12 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ChoiceService {
 	private static final Logger LOG = LoggerFactory.getLogger(ChoiceService.class);
@@ -63,13 +64,32 @@ public class ChoiceService {
 		return rollCount;
 	}
 
-	public Choice add(String choiceName) {
-		if (Strings.isNullOrEmpty(choiceName)) throw new IllegalArgumentException("choiceName cannot be null or empty");
-		Choice newChoice = new Choice.Builder().id(findNextChoiceId()).name(choiceName).build();
-		db.put(newChoice.getId(), newChoice);
-		LOG.info("new Choice is added: {}", newChoice);
-		return newChoice;
-	}
+    public Choice add(String choiceName) {
+        if (Strings.isNullOrEmpty(choiceName)) throw new IllegalArgumentException("choiceName cannot be null or empty");
+        List<Choice> choices = add(Arrays.asList(new Choice.Builder().name(choiceName).build()));
+        return choices.isEmpty() ? null : choices.get(0);
+    }
+
+    /**
+     * It would first remove ALL the choices in the DB and then insert new records based on <code>choices</code>
+     */
+    public List<Choice> replace(List<Choice> choices) {
+        if (choices == null) throw new IllegalArgumentException("choices cannot be null");
+        db.clear();
+        return add(choices);
+    }
+
+    public List<Choice> add(List<Choice> choices) {
+        if (choices == null) throw new IllegalArgumentException("choices cannot be null");
+        boolean invalidChoiceIsDetected = choices.stream().allMatch(c -> Strings.isNullOrEmpty(c.getName()));
+        if (invalidChoiceIsDetected) throw new InvalidChoiceException("Choice name could NOT be empty");
+        // persist
+        choices.stream().forEach(c -> {
+            c.setId(findNextChoiceId());
+            db.put(c.getId(), c);
+        });
+        return choices;
+    }
 
 	public Choice delete(long id) {
 		LOG.info("Choice with id[{}] is going to be deleted", id);
@@ -78,26 +98,22 @@ public class ChoiceService {
 		return removedChoice;
 	}
 
-	private List<Choice> convert(File file) throws IOException {
+	public List<Choice> convert(File file) throws IOException {
 		if (file == null || !file.exists() || !file.isFile())
 			throw new IllegalArgumentException("invalid file input is detected: " + file);
-		return Files.lines(file.toPath())
+		return Files.readLines(file, StandardCharsets.UTF_8)
+                .stream()
 				.filter(l -> !l.isEmpty())
-				.flatMap(l -> {
-					String[] tokens = l.split(",");
-					if (tokens.length != 2)
-						throw new IllegalStateException("there should have exactly 2 token in line: " + l);
-					return Stream
-							.of(new Choice.Builder().id(Long.valueOf(tokens[0].trim())).name(tokens[1].trim()).build());
-				})
+				.map(l -> new Choice.Builder().name(l.trim()).build())
 				.collect(Collectors.toList());
 	}
 
 	private List<Choice> defaultChoices() {
 		List<Choice> defaultChoices = Lists.newArrayList();
-		for (String choiceName : DEFAULT_CHOICE_NAMES) {
-			defaultChoices.add(new Choice.Builder().id(findNextChoiceId()).name(choiceName).build());
-		}
+        defaultChoices.addAll(
+                DEFAULT_CHOICE_NAMES.stream()
+                .map(choiceName -> new Choice.Builder().id(findNextChoiceId()).name(choiceName).build())
+                .collect(Collectors.toList()));
 		return defaultChoices;
 	}
 

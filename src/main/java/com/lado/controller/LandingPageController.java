@@ -1,6 +1,7 @@
 package com.lado.controller;
 
 import com.google.common.base.Strings;
+import com.google.common.io.Files;
 import com.lado.model.Choice;
 import com.lado.service.ChoiceService;
 import com.lado.util.Fxmls;
@@ -12,17 +13,18 @@ import io.datafx.controller.flow.context.ViewFlowContext;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @FXMLController("/fxml/landing-page.fxml")
@@ -104,6 +106,7 @@ public class LandingPageController {
 			Fxmls.createStandardAlertAndShow(Alert.AlertType.WARNING, "Add choice", null, "Please enter Choice Name");
 			return;
 		}
+        // TODO: add handling for InvalidChoiceException
 		choiceService.add(newChoiceName);
 		refreshChoices();
 		newChoiceNameField.setText("");
@@ -122,43 +125,72 @@ public class LandingPageController {
 
 	@ActionMethod(ACTION_IMPORT_CHOICES)
 	public void importChoices() {
-		// TODO: implement this
-		Fxmls.createStandardAlertAndShow(Alert.AlertType.INFORMATION, "Import", null, "Coming soon...");
-		if (1 == 1) return;
-		try {
-			FileChooser chooser = new FileChooser();
-			chooser.setTitle("Open File");
-			File file = chooser.showOpenDialog(new Stage());
-			String fileContentType = Files.probeContentType(file.toPath());
-			if (!"text/plain".equals(fileContentType)) Fxmls.createStandardAlertAndShow(Alert.AlertType.WARNING, "Import", null, "Only text file is allowed");
-			// convert file into list of pojo
-			// append the list of pojo into the current list
-		} catch (Exception e) {
-			LOG.error("e: " + e, e);
-			Fxmls.createStandardExceptionDialogAndShow("Import", null, "Fail to import file", e);
-		}
-	}
+        try {
+            FileChooser fileChooser = generateFileChooserForImportAndExport("Import Choices");
+            File file = fileChooser
+                    .showOpenDialog(viewFlowContext.getCurrentViewContext().getRootNode().getScene().getWindow());
+            if (file == null) return;
+            List<Choice> importedChoices = choiceService.convert(file);
+            List<String> choiceNames = importedChoices.stream().map(Choice::getName).collect(Collectors.toList());
+            // create a dialog to show the imported choices and let user decide to ADD or REPLACE
+            Alert importChoicesAlert =
+                    Fxmls.createStandardAlert(Alert.AlertType.INFORMATION, "Import Choices",
+                            "Import the following choices", null);
+            // create TextArea to store the choices
+            TextArea choicesArea =
+                    new TextArea(choiceNames.stream().collect(Collectors.joining(System.lineSeparator())));
+            choicesArea.setEditable(false);
+            choicesArea.setWrapText(true);
+            // configure the TextArea layout
+            choicesArea.setMaxWidth(Double.MAX_VALUE);
+            choicesArea.setMaxHeight(Double.MAX_VALUE);
+            GridPane.setVgrow(choicesArea, Priority.ALWAYS);
+            GridPane.setHgrow(choicesArea, Priority.ALWAYS);
+            // put the choices TextArea into the GridPane
+            GridPane choicesPane = new GridPane();
+            choicesPane.setMaxWidth(Double.MAX_VALUE);
+            choicesPane.add(choicesArea, 0, 0);
+            // Set choicesPane into the dialog pane
+            importChoicesAlert.getDialogPane().setContent(choicesPane);
+
+            // create ADD and REPLACE button
+            ButtonType addButton = new ButtonType("Add");
+            ButtonType replaceButton = new ButtonType("Replace");
+            ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+            importChoicesAlert.getButtonTypes().setAll(addButton, replaceButton, cancelButton);
+
+            // show the alert
+            Optional<ButtonType> result = importChoicesAlert.showAndWait();
+            // TODO: add handling for InvalidChoiceException
+            if (result.get() == addButton) {
+                choiceService.add(importedChoices);
+            } else if (result.get() == replaceButton) {
+                choiceService.replace(importedChoices);
+            }
+            refreshChoices();
+        } catch (Exception e) {
+            LOG.error("e: " + e, e);
+            Fxmls.createStandardExceptionDialogAndShow("Import", null, "Fail to import choices", e);
+        }
+    }
 
 	@ActionMethod(ACTION_EXPORT_CHOICES)
 	public void exportChoices() {
         try {
-            FileChooser fileChooser = new FileChooser();
-            //Set extension filter
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt"));
+            FileChooser fileChooser = generateFileChooserForImportAndExport("Export Choices");
             File file = fileChooser.showSaveDialog(
                     viewFlowContext.getCurrentViewContext().getRootNode().getScene().getWindow());
-            try (FileWriter fileWriter = new FileWriter(file)) {
-                for (String choice : choiceService.findAll().stream().map(Choice::getName)
-                        .collect(Collectors.toList())) {
-                    fileWriter.write(choice);
-                    fileWriter.write(System.lineSeparator());
-                }
-            }
+            if (file == null) return;
+            Files.write(choiceService.findAll()
+                            .stream()
+                            .map(Choice::getName)
+                            .collect(Collectors.joining(System.lineSeparator()))
+                    , file, StandardCharsets.UTF_8);
         } catch (Exception e) {
             LOG.error("e: " + e, e);
             Fxmls.createStandardExceptionDialogAndShow("Export Choice Fail", null, "Fail to export choices", e);
         }
-	}
+    }
 
 	@ActionMethod(ACTION_ROLLING)
 	public void rolling() {
@@ -176,4 +208,12 @@ public class LandingPageController {
 	private void refreshChoices() {
 		choices.setItems(FXCollections.observableArrayList(choiceService.findAll()));
 	}
+
+    private FileChooser generateFileChooserForImportAndExport(String title) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(title);
+        //Set extension filter
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt"));
+        return fileChooser;
+    }
 }
