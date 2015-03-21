@@ -5,6 +5,7 @@ import com.google.common.io.Files;
 import com.lado.model.Choice;
 import com.lado.service.ChoiceService;
 import com.lado.util.Fxmls;
+import com.lado.view.ChoiceListCell;
 import io.datafx.controller.FXMLController;
 import io.datafx.controller.flow.action.ActionMethod;
 import io.datafx.controller.flow.action.ActionTrigger;
@@ -20,7 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -84,18 +86,8 @@ public class LandingPageController {
 	public void init() throws IOException, URISyntaxException {
 		// TODO: should use IoC framework
 		choiceService = new ChoiceService();
-		choices.setCellFactory(v -> new ListCell<Choice>() {
-			@Override
-			protected void updateItem(Choice choice, boolean empty) {
-				super.updateItem(choice, empty);
-				if (empty || choice == null) {
-					setText(null);
-					setGraphic(null);
-				} else {
-					setText(choice.getName());
-				}
-			}
-		});
+		choices.setEditable(true);
+		choices.setCellFactory(listView -> new ChoiceListCell(choiceService));
 		refreshChoices();
 	}
 
