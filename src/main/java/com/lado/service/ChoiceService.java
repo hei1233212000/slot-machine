@@ -91,6 +91,12 @@ public class ChoiceService {
         return choices;
     }
 
+	public Choice update(Choice choice) {
+		LOG.info("choice would be updated: {}", choice);
+		if (choice == null) throw new IllegalArgumentException("choice cannot be null");
+		return db.putIfAbsent(choice.getId(), choice);
+	}
+
 	public Choice delete(long id) {
 		LOG.info("Choice with id[{}] is going to be deleted", id);
 		Choice removedChoice = db.remove(id);
