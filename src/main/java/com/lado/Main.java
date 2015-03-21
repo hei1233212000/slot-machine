@@ -18,7 +18,6 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		try {
-			primaryStage.setTitle("Slot Machine");
 			new Flow(LandingPageController.class).startInStage(primaryStage);
 		} catch (Exception e) {
 			LOG.error("e: " + e, e);

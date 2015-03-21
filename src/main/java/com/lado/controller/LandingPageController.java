@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@FXMLController("/fxml/landing-page.fxml")
+@FXMLController(value = "/fxml/landing-page.fxml", title = "Slot Machine")
 public class LandingPageController {
 	private static final Logger LOG = LoggerFactory.getLogger(LandingPageController.class);
 
