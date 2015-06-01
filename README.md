@@ -5,7 +5,7 @@ Learn JavaFx and have fun
 Please make sure you have installed [Java 8u40+][JDK Download Site], [Groovy] and [Gradle]
 
 ### Build
-    gardle clean assemble
+    gradle clean assemble
 
 [Groovy]: http://groovy.codehaus.org/
 [Gradle]: https://gradle.org/
